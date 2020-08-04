@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BlogService.Controllers;
 using BlogService.Db;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -33,10 +34,17 @@ namespace BlogService
         {
             services.AddCors();
 
-            services.AddDbContext<BlogContext>(options =>
-              options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<BlogContext>(options => options.UseSqlServer(Configuration.GetValue<string>("DefaultConnection")));
 
-            services.AddIdentity<User, IdentityRole>()
+            services.AddIdentity<User, IdentityRole>(options =>
+                    {
+                        options.Password.RequireDigit = false;
+                        options.Password.RequiredUniqueChars = 0;
+                        options.Password.RequiredLength = 0;
+                        options.Password.RequireUppercase = false;
+                        options.Password.RequireLowercase = false;
+                        options.Password.RequireNonAlphanumeric = false;
+                    })
                     .AddEntityFrameworkStores<BlogContext>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -53,6 +61,8 @@ namespace BlogService
                             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"]))
                         };
                     });
+
+            services.AddHostedService<DbSeeder>();
 
             services.AddMvc()
                     .AddNewtonsoftJson();
@@ -72,6 +82,12 @@ namespace BlogService
 
             app.UseRouting();
 
+            app.UseCors(config =>
+            {
+                config.AllowAnyOrigin();
+                config.AllowAnyHeader();
+                config.AllowAnyMethod();
+            });
             app.UseAuthentication();
             app.UseAuthorization();
 

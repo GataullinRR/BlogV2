@@ -1,0 +1,16 @@
+﻿@if (IsInline)
+{
+    <DataAnnotationsValidator />
+}
+else
+{
+    <div class="row">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    public bool IsInline { get; set; }
+}

@@ -1,0 +1,53 @@
+﻿@using System.Linq.Expressions;
+
+@if (IsInline)
+{
+    <div class="form-group">
+        <label class="mx-1">@Name</label>
+        <InputText disabled="@IsDisabled" class="form-control mx-1" @attributes="@AdditionalAttributes" Value="@Value" ValueChanged="@ValueChanged" ValueExpression="@ValueExpression" />
+    </div>
+}
+else
+{
+    <div class="row mb-2">
+        <div class="col-md-7 my-auto">
+            <label>@Name</label>
+        </div>
+
+        <div class="col-md-5">
+            <InputText disabled="@IsDisabled" class="form-control" @attributes="@AdditionalAttributes" Value="@Value" ValueChanged="@ValueChanged" ValueExpression="@ValueExpression" />
+        </div>
+    </div>
+
+    @*<div class="row mb-2">
+        <label>@Name</label>
+    </div>
+
+    <div class="row mb-2">
+        <InputText disabled="@IsDisabled" class="form-control" @attributes="@AdditionalAttributes" Value="@Value" ValueChanged="@ValueChanged" ValueExpression="@ValueExpression" />
+    </div>*@
+}
+
+@code {
+    [CascadingParameter]
+    public bool IsInline { get; set; }
+
+    [CascadingParameter(Name = "IsDisabled")]
+    public bool IsDisabled { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+
+    // from https://github.com/dotnet/aspnetcore/issues/8386
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public Expression<Func<string>> ValueExpression { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
+}

@@ -22,52 +22,56 @@ namespace BlogService.Controllers
     {
         private readonly BlogContext _db;
         private readonly IConfiguration _configuration;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
 
-        public AuthController(IConfiguration configuration, SignInManager<IdentityUser> signInManager)
+        public AuthController(BlogContext db, IConfiguration configuration, SignInManager<User> signInManager, UserManager<User> userManager)
         {
+            _db = db ?? throw new ArgumentNullException(nameof(db));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
         [HttpPost(BlogServiceEndpoints.SignIn)]
-        public async Task<IActionResult> Login(SignInRequest request)
+        public async Task<IActionResult> SignIn(SignInRequest request)
         {
             var result = await _signInManager.PasswordSignInAsync(request.UserName, request.Password, false, false);
 
-            if (!result.Succeeded)
+            if (result.Succeeded)
             {
-                return BadRequest(null);
+                var user = await _signInManager.UserManager.FindByNameAsync(request.UserName);
+                var roles = await _signInManager.UserManager.GetRolesAsync(user);
+                var claims = new List<Claim>();
+                claims.Add(new Claim(ClaimTypes.Name, request.UserName));
+
+                foreach (var role in roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+                }
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecurityKey"]));
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var expiry = DateTime.Now.AddDays(Convert.ToInt32(_configuration["JwtExpiryInDays"]));
+
+                var token = new JwtSecurityToken(
+                    _configuration["JwtIssuer"],
+                    _configuration["JwtAudience"],
+                    claims,
+                    expires: expiry,
+                    signingCredentials: creds
+                );
+
+                return Ok(new SignInResponse(new JwtSecurityTokenHandler().WriteToken(token)));
             }
-
-            var user = await _signInManager.UserManager.FindByNameAsync(request.UserName);
-            var roles = await _signInManager.UserManager.GetRolesAsync(user);
-            var claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, request.UserName));
-
-            foreach (var role in roles)
+            else
             {
-                claims.Add(new Claim(ClaimTypes.Role, role));
+                return BadRequest();
             }
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSecurityKey"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiry = DateTime.Now.AddDays(Convert.ToInt32(_configuration["JwtExpiryInDays"]));
-
-            var token = new JwtSecurityToken(
-                _configuration["JwtIssuer"],
-                _configuration["JwtAudience"],
-                claims,
-                expires: expiry,
-                signingCredentials: creds
-            );
-
-            return Ok(new SignInResponse(new JwtSecurityTokenHandler().WriteToken(token)));
         }
 
         [HttpPost(BlogServiceEndpoints.SignOut)]
-        public async Task<IActionResult> Logout(SignOutRequest request)
+        public async Task<IActionResult> SignOut(SignOutRequest request)
         {
 #warning Implement!
             return Ok(new SignOutResponse());
@@ -91,7 +95,7 @@ namespace BlogService.Controllers
             }
             else
             {
-                if (await _db.Users.CountAsync() == 0)
+                if (await _db.Users.CountAsync() == 1)
                 {
                     await _userManager.AddToRoleAsync(newUser, Roles.Admin);
                 }

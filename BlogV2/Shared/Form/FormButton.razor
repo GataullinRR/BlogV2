@@ -1,0 +1,49 @@
+﻿@if (IsInline)
+{
+    <button class="btn @getButtonClass() mx-1" type="@(IsSubmit ? "submit" : "button")" disabled="@IsDisabled" @onclick="OnClick">@Name</button>
+}
+else
+{
+    <div class="row">
+        <button class="btn @getButtonClass()" type="@(IsSubmit ? "submit" : "button")" style="width:100%" disabled="@IsDisabled" @onclick="OnClick">@Name</button>
+    </div>
+}
+
+@code {
+    public enum ButtonType
+    {
+        Primary,
+        Danger
+    }
+
+    [CascadingParameter]
+    public bool IsInline { get; set; }
+
+    [CascadingParameter(Name = "IsDisabled")]
+    public bool IsDisabled { get; set; }
+
+    [CascadingParameter]
+    public EditContext Context { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public ButtonType Type { get; set; }
+
+    [Parameter]
+    public Func<Task> OnClick { get; set; }
+
+    [Parameter]
+    public bool IsSubmit { get; set; }
+
+    string getButtonClass()
+    {
+        return Type switch
+        {
+            ButtonType.Danger => "btn-danger",
+            ButtonType.Primary => "btn-primary",
+            _ => throw new NotSupportedException()
+        };
+    }
+}

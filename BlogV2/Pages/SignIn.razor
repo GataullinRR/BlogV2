@@ -2,22 +2,14 @@
 @inject IAuthService Auth;
 @inject NavigationManager Navigator;
 
-<h3>SignIn</h3>
+<FormTemplate OnSubmit="SignInAsync">
+    <FormTextInput Name="User name" @bind-Value="@_model.UserName" />
+    <FormTextInput Name="Password" type="password" @bind-Value="@_model.Password" />
 
-<EditForm Model="_model" OnValidSubmit="() => GoToMainAsync()">
-    <label>User name:</label>
-    <InputText @bind-Value="_model.UserName" />
-    <label>Password:</label>
-    <InputText @bind-Value="_model.Password" />
-    <label>Password confirmation:</label>
-    <InputText @bind-Value="_model.PasswordConfirmation" />
+    <FormValidator/>
 
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <button type="submit">Sign in</button>
-</EditForm>
-
+    <FormButton Name="Sign In" IsSubmit="true" />
+</FormTemplate>
 
 @code {
     public class SignInModel
@@ -27,10 +19,6 @@
 
         [Required]
         public string Password { get; set; }
-
-        [Required]
-        [Compare(nameof(Password))]
-        public string PasswordConfirmation { get; set; }
     }
 
     public static string GetPath()
@@ -40,7 +28,7 @@
 
     readonly SignInModel _model = new SignInModel();
 
-    public async Task GoToMainAsync()
+    public async Task SignInAsync()
     {
         await Auth.SignInAsync(new SignInRequest(_model.UserName, _model.Password));
 

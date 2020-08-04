@@ -1,10 +1,46 @@
 ﻿@page "/signup"
+@inject IBlogService Blog;
+@inject NavigationManager Navigator;
 
-<h3>SignUp</h3>
+<FormTemplate OnSubmit="SignUpAsync">
+    <FormTextInput Name="User name" @bind-Value="@_model.UserName" />
+    <FormTextInput Name="E-mail" @bind-Value="@_model.EMail" />
+    <FormTextInput Name="Password" type="password" @bind-Value="@_model.Password" />
+    <FormTextInput Name="Password confirmation" type="password" @bind-Value="@_model.PasswordConfirmation" />
+
+    <FormValidator />
+
+    <FormButton Name="Sign Up" IsSubmit="true" />
+</FormTemplate>
 
 @code {
+    public class SignUpModel
+    {
+        [Required]
+        public string UserName { get; set; }
+
+        [Required]
+        public string EMail { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+
+        [Required]
+        [Compare(nameof(Password))]
+        public string PasswordConfirmation { get; set; }
+    }
+
     public static string GetPath()
     {
         return "/signup";
+    }
+
+    readonly SignUpModel _model = new SignUpModel();
+
+    public async Task SignUpAsync()
+    {
+        await Blog.SignUpAsync(new SignUpRequest(_model.UserName, _model.EMail, _model.Password));
+
+        Navigator.NavigateTo(SignIn.GetPath());
     }
 }
