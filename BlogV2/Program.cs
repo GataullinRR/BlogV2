@@ -8,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
+using BlogService.API;
+using Microsoft.EntityFrameworkCore.Internal;
+using Shared;
 
 namespace BlogV2
 {
@@ -18,13 +21,19 @@ namespace BlogV2
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
-            builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-            builder.Services.AddBlazoredLocalStorage();
-            builder.Services.AddOptions();
-            builder.Services.AddAuthorizationCore();
-            builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+            var services = builder.Services;
+            //builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            services.AddBlazoredLocalStorage();
+            services.AddOptions();
+            services.AddAuthorizationCore();
+            services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddSingleton<AuthTokenProvider>();
+            services.AddTransient<IAuthTokenProvider>(sp => sp.GetRequiredService<AuthTokenProvider>());
+            services.AddBlogService(builder.Configuration);
 
             await builder.Build().RunAsync();
         }
+
     }
 }

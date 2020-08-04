@@ -1,4 +1,7 @@
-﻿<div class="col-12" style="padding-left:0;padding-right:0;">
+﻿@inject NavigationManager Navigator;
+@inject IAuthService Auth;
+
+<div class="col-12" style="padding-left:0;padding-right:0;">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Absurd coding</a>
 
@@ -11,13 +14,13 @@
                 <AuthorizeView>
                     <Authorized>
                         <li class="nav-item active">
-                            <a class="nav-link" href="#">Logout</a>
+                            <NavLink class="nav-link" @onclick="() => Auth.SignOutAsync()">SignOut</NavLink>
                         </li>
                     </Authorized>
 
                     <NotAuthorized>
                         <li class="nav-item active">
-                            <a class="nav-link" href="#">Login</a>
+                            <NavLink class="nav-link" @onclick="() => Navigator.NavigateTo(BlogV2.Pages.SignIn.GetPath())">SignIn</NavLink>
                         </li>
                     </NotAuthorized>
                 </AuthorizeView>

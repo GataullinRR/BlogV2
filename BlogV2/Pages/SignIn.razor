@@ -1,0 +1,49 @@
+﻿@page "/signin"
+@inject IAuthService Auth;
+@inject NavigationManager Navigator;
+
+<h3>SignIn</h3>
+
+<EditForm Model="_model" OnValidSubmit="() => GoToMainAsync()">
+    <label>User name:</label>
+    <InputText @bind-Value="_model.UserName" />
+    <label>Password:</label>
+    <InputText @bind-Value="_model.Password" />
+    <label>Password confirmation:</label>
+    <InputText @bind-Value="_model.PasswordConfirmation" />
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <button type="submit">Sign in</button>
+</EditForm>
+
+
+@code {
+    public class SignInModel
+    {
+        [Required]
+        public string UserName { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+
+        [Required]
+        [Compare(nameof(Password))]
+        public string PasswordConfirmation { get; set; }
+    }
+
+    public static string GetPath()
+    {
+        return "/signin";
+    }
+
+    readonly SignInModel _model = new SignInModel();
+
+    public async Task GoToMainAsync()
+    {
+        await Auth.SignInAsync(new SignInRequest(_model.UserName, _model.Password));
+
+        Navigator.NavigateTo("/");
+    }
+}
