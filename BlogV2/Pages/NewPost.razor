@@ -1,10 +1,50 @@
 ﻿@page "/create"
+@inject IBlogService Blog
+@inject NavigationManager Navigator
+@inject IJSRuntime jsRuntime
 
-<h3>NewPost</h3>
+<div class="col mx-auto">
+    <FormTemplate Model="_model" OnSubmit="PostAsync">
+        <span>Title</span>
+        <FormTextInput @bind-Value="@_model.Title" />
+
+        <span>Body</span>
+        <textarea class="form-control rich-edit" />
+
+        <FormValidator />
+
+        <div class="mt-2">
+            <FormButton Name="Publish" IsSubmit="true" />
+        </div>
+    </FormTemplate>
+</div>
 
 @code {
     public static string GetPath()
     {
         return "/create";
+    }
+
+    readonly PostData _model = new PostData();
+
+    public async Task PostAsync()
+    {
+        _model.Body = await jsRuntime.InvokeAsync<string>("GetBody");
+        var response = await Blog.CreatePostsAsync(new CreatePostsRequest(_model));
+        Navigator.NavigateTo(Post.GetPath(response.Ids.Single()));
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        _model.Body = "TEST";
+
+        return base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await jsRuntime.InvokeAsync<object>("InitTinyMCE", "");
+
+        await base.OnAfterRenderAsync(firstRender);
     }
 }

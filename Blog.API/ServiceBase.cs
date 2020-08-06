@@ -12,7 +12,7 @@ namespace BlogService.API
         protected readonly JsonSerializerSettings _json_settings = new JsonSerializerSettings()
         {
             Formatting = Formatting.Indented,
-            TypeNameHandling = TypeNameHandling.All,
+            //TypeNameHandling = TypeNameHandling.All,
         };
 
         readonly HttpClient _client;

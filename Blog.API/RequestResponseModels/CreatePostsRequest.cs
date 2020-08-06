@@ -1,21 +1,20 @@
 ﻿using BlogService.Db;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlogService.API
 {
-    public class QueryPostsResponse
+    public class CreatePostsRequest
     {
         [Required]
-        public List<Post> Posts { get; set; }
+        public PostData[] Posts { get; set; }
 
-        public QueryPostsResponse()
+        public CreatePostsRequest()
         {
 
         }
 
-        public QueryPostsResponse(List<Post> posts)
+        public CreatePostsRequest(params PostData[] posts)
         {
             Posts = posts ?? throw new ArgumentNullException(nameof(posts));
         }

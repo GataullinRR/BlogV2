@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>BlogV2</title>
+    <title>Blog</title>
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
@@ -18,7 +18,62 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+
+    <script src="https://cdn.tiny.cloud/1/6xcikwqalselltmhunqnriulh959p2aqkadbcipate8yqlvw/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        function InitTinyMCE() {
+            tinymce.init({
+                mode: "specific_textareas",
+                editor_selector: "rich-edit",
+                plugins: 'preview paste searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen table image link codesample charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+                imagetools_cors_hosts: ['picsum.photos'],
+                toolbar: 'undo redo | bold italic underline strikethrough | outdent indent |  numlist bullist | removeformat | charmap emoticons | fullscreen preview | insertfile image media link anchor codesample',
+                toolbar_sticky: true,
+                autosave_ask_before_unload: true,
+                autosave_interval: "30s",
+                autosave_prefix: "{path}{query}-{id}-",
+                autosave_restore_when_empty: false,
+                autosave_retention: "10m",
+                image_advtab: true,
+                importcss_append: true,
+                height: 400,
+                height: 600,
+                image_caption: true,
+                quickbars_selection_toolbar: 'bold italic underline strikethrough | quicklink blockquote quickimage quicktable',
+                noneditable_noneditable_class: "mceNonEditable",
+                toolbar_drawer: 'sliding',
+                contextmenu: "link image imagetools",
+                menu: {
+                    file: { title: 'File', items: 'newdocument restoredraft | preview | print ' },
+                    edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
+                    view: { title: 'View', items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen' },
+                    insert: { title: 'Insert', items: 'image link media codesample inserttable | charmap emoticons hr | anchor toc | insertdatetime' },
+                    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
+                    tools: { title: 'Tools', items: 'code wordcount' },
+                    table: { title: 'Table', items: 'inserttable tableprops deletetable row column cell' },
+                    help: { title: 'Help', items: '' }
+                }
+            });
+        }
+
+        function GetBody() {
+            return tinymce.activeEditor.getContent();
+        }
+    </script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
 </html>
+
+<footer>
+    <div class="mx-3 mt-3">
+        <div class="d-flex">
+            <span style="white-space: pre">Created by <a href="https://github.com/GataullinRR">GataullinRR</a></span>
+            <span class="ml-auto">Powered by Blazor WASM</span>
+        </div>
+
+        <div class="d-flex">
+            <span class="small text-muted">The blog is under development, functionality is very limited. <a href="https://github.com/GataullinRR/Blog">The first version</a> was better!</span>
+        </div>
+    </div>
+</footer>

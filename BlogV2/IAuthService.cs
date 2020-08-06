@@ -9,5 +9,7 @@ namespace BlogV2
         Task SignInAsync(SignInRequest request);
         Task SignOutAsync();
         Task SignUpAsync(SignUpRequest request);
+        
+        Task LoadTokenAsync();
     }
 }

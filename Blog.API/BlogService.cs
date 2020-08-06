@@ -10,6 +10,11 @@ namespace BlogService.API
 
         }
 
+        public async Task<CreatePostsResponse> CreatePostsAsync(CreatePostsRequest request)
+        {
+            return await MakeRequestAsync<CreatePostsRequest, CreatePostsResponse>(HttpMethod.Post, BlogServiceEndpoints.CreatePosts, request);
+        }
+
         public async Task<QueryPostsResponse> QueryPostsAsync(QueryPostsRequest request)
         {
             return await MakeRequestAsync<QueryPostsRequest, QueryPostsResponse>(HttpMethod.Post, BlogServiceEndpoints.QueryPosts, request);

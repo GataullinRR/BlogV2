@@ -3,7 +3,7 @@
 
 <div class="col-12" style="padding-left:0;padding-right:0;">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="" @onclick:preventDefault>Absurd coding</a>
+        <a class="navbar-brand" href="">Absurd coding</a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -14,13 +14,13 @@
                 <AuthorizeView>
                     <Authorized>
                         <li class="nav-item">
-                            <a class="nav-link" href="" @onclick:preventDefault @onclick="() => Auth.SignOutAsync()">SignOut</a>
+                            <a class="nav-link" href="" @onclick:preventDefault @onclick="() => Auth.SignOutAsync()">Sign out</a>
                         </li>
                     </Authorized>
 
                     <NotAuthorized>
                         <li class="nav-item">
-                            <a class="nav-link" href="" @onclick:preventDefault @onclick="() => Navigator.NavigateTo(BlogV2.Pages.SignIn.GetPath())">SignIn</a>
+                            <a class="nav-link" href="" @onclick:preventDefault @onclick="() => Navigator.NavigateTo(BlogV2.Pages.SignIn.GetPath())">Sign in</a>
                         </li>
                     </NotAuthorized>
                 </AuthorizeView>

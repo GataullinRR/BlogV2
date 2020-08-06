@@ -1,9 +1,27 @@
 ﻿@page "/"
+@inject IBlogService Blog
 
-<div class="col mx-auto" style="max-width:1000px">
-    <h1>Hello, world!</h1>
+<div class="col mx-auto">
+    @if (_posts != null)
+    {
+        @foreach (var post in _posts)
+        {
+            <PostPreview Post="post" />
+        }
 
-    <div>
-        Welcome to your new app.
-    </div>
+        <div>
+            <span>@_posts.Count posts shown</span>
+        </div>
+    }
 </div>
+
+@code {
+    private IList<BlogService.Db.Post> _posts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _posts = (await Blog.QueryPostsAsync(QueryPostsRequest.QueryAll())).Posts;
+
+        await base.OnInitializedAsync();
+    }
+}

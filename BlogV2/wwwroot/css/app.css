@@ -1,5 +1,54 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+.mce-content-body table {
+    border-collapse: collapse
+}
+
+    .mce-content-body table td, table th {
+        border: 1px solid #ccc;
+        padding: .4rem
+    }
+
+.mce-content-body figure {
+    display: table;
+    margin: 1rem auto
+}
+
+    .mce-content-body figure figcaption {
+        color: #999;
+        display: block;
+        margin-top: .25rem;
+        text-align: center
+    }
+
+.mce-content-body hr {
+    border-color: #ccc;
+    border-style: solid;
+    border-width: 1px 0 0 0
+}
+
+.mce-content-body code {
+    background-color: #e8e8e8;
+    border-radius: 3px;
+    padding: .1rem .2rem
+}
+
+.mce-content-body:not([dir=rtl]) blockquote {
+    border-left: 2px solid #ccc;
+    margin-left: 1.5rem;
+    padding-left: 1rem
+}
+
+.mce-content-body[dir=rtl] blockquote {
+    border-right: 2px solid #ccc;
+    margin-right: 1.5rem;
+    padding-right: 1rem
+}
+
+.col-root {
+    max-width: 1000px;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }

@@ -11,5 +11,6 @@ namespace BlogService.API
         Task<SignUpResponse> SignUpAsync(SignUpRequest request);
         Task<QueryPostsResponse> QueryPostsAsync(QueryPostsRequest request);
         Task<UpdatePostsResponse> UpdatePostsAsync(UpdatePostsRequest request);
+        Task<CreatePostsResponse> CreatePostsAsync(CreatePostsRequest request);
     }
 }

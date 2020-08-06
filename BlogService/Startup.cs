@@ -1,15 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using AspNetCore.IServiceCollection.AddIUrlHelper;
 using BlogService.Controllers;
 using BlogService.Db;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +25,28 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace BlogService
 {
+    public static class Extensions
+    {
+        public static IApplicationBuilder UseJwtTokenMiddleware(
+            this IApplicationBuilder app,
+            string schema = "Bearer")
+        {
+            return app.Use((async (ctx, next) =>
+            {
+                IIdentity identity = ctx.User.Identity;
+                if ((identity != null ? (!identity.IsAuthenticated ? 1 : 0) : 1) != 0)
+                {
+                    AuthenticateResult authenticateResult = await ctx.AuthenticateAsync(schema);
+                    if (authenticateResult.Succeeded && authenticateResult.Principal != null)
+                    {
+                        ctx.User = authenticateResult.Principal;
+                    }
+                }
+                await next();
+            }));
+        }
+    }
+
     public class Startup
     {
         public IConfiguration Configuration { get; set; }
@@ -37,32 +65,67 @@ namespace BlogService
             services.AddDbContext<BlogContext>(options => options.UseSqlServer(Configuration.GetValue<string>("DefaultConnection")));
 
             services.AddIdentity<User, IdentityRole>(options =>
-                    {
-                        options.Password.RequireDigit = false;
-                        options.Password.RequiredUniqueChars = 0;
-                        options.Password.RequiredLength = 0;
-                        options.Password.RequireUppercase = false;
-                        options.Password.RequireLowercase = false;
-                        options.Password.RequireNonAlphanumeric = false;
-                    })
-                    .AddEntityFrameworkStores<BlogContext>();
+                {
+                    options.Password.RequireDigit = false;
+                    options.Password.RequiredUniqueChars = 0;
+                    options.Password.RequiredLength = 0;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                })
+                .AddEntityFrameworkStores<BlogContext>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(options =>
+            services
+                .AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }).AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = true;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
                     {
-                        options.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            ValidateIssuer = true,
-                            ValidateAudience = true,
-                            ValidateLifetime = true,
-                            ValidateIssuerSigningKey = true,
-                            ValidIssuer = Configuration["JwtIssuer"],
-                            ValidAudience = Configuration["JwtAudience"],
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"]))
-                        };
-                    });
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration["JwtIssuer"],
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["JwtSecurityKey"])),
+                        ValidAudience = Configuration["JwtAudience"],
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.FromMinutes(1)
+                    };
+                });
+            // DOESNT WORK!
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //        .AddJwtBearer(options =>
+            //        {
+            //            options.SaveToken = true;
+            //            options.TokenValidationParameters = new TokenValidationParameters
+            //            {
+            //                ValidateIssuer = true,
+            //                ValidateAudience = true,
+            //                ValidateLifetime = true,
+            //                ValidateIssuerSigningKey = true,
+            //                ValidIssuer = Configuration["JwtIssuer"],
+            //                ValidAudience = Configuration["JwtAudience"],
+            //                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"]))
+            //            };
+            //        });
 
             services.AddHostedService<DbSeeder>();
+
+            services.AddScoped<IStorage, Storage>();
+            services.AddScoped<IPostSanitizer, PostSanitizer>();
+
+            services.AddHttpContextAccessor();
+            services.AddUrlHelper();
+            //services.AddScoped<IUrlHelper>(factory =>
+            //{
+            //    var actionContext = factory.GetService<IActionContextAccessor>()
+            //                               .ActionContext;
+            //    return new UrlHelper(actionContext);
+            //});
 
             services.AddMvc()
                     .AddNewtonsoftJson();
@@ -90,6 +153,7 @@ namespace BlogService
             });
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {

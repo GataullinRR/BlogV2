@@ -8,12 +8,19 @@
         }
         else
         {
-            <div class="form-sm align-middle" @attributes="@AdditionalAttributes">
-                <div class="container">
+            <div class="align-middle" @attributes="@AdditionalAttributes">
+                @if (Model == null)
+                {
+                    <EditForm EditContext="Context" OnValidSubmit="OnSubmit">
+                        @ChildContent
+                    </EditForm>
+                }
+                else
+                {
                     <EditForm Model="Model" OnValidSubmit="OnSubmit">
                         @ChildContent
                     </EditForm>
-                </div>
+                }
             </div>
         }
     </CascadingValue>

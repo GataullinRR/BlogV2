@@ -22,6 +22,11 @@ namespace BlogV2
             _tokenProvider = tokenProvider ?? throw new ArgumentNullException(nameof(tokenProvider));
         }
 
+        public async Task LoadTokenAsync()
+        {
+            _tokenProvider.Token = await _localStorage.GetItemAsync<string>("authToken");
+        }
+
         public async Task SignInAsync(SignInRequest request)
         {
             var result = await _blog.SignInAsync(request);
