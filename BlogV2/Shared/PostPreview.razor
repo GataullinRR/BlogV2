@@ -2,7 +2,7 @@
 
 @if (Post != null)
 {
-    <div class="my-2">
+    <div class="mb-2">
         <h3><InlineButton @onclick="() => Navigator.NavigateTo(Pages.Post.GetPath(Post.Id))"><span class="@(Post.IsHidden ? "text-muted" : "")">@Post.Title</span></InlineButton></h3>
 
         <div>@((MarkupString)@Post.BodyPreview)</div>

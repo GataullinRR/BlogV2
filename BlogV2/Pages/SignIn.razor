@@ -2,14 +2,18 @@
 @inject IAuthService Auth;
 @inject NavigationManager Navigator;
 
-<FormTemplate OnSubmit="SignInAsync">
-    <FormTextInput Name="User name" @bind-Value="@_model.UserName" />
-    <FormTextInput Name="Password" type="password" @bind-Value="@_model.Password" />
+<div class="form-sm mx-auto">
+    <FormTemplate OnSubmit="SignInAsync">
+        <span>User name</span>
+        <FormTextInput @bind-Value="@_model.UserName" />
+        <span>Password</span>
+        <FormTextInput type="password" @bind-Value="@_model.Password" />
 
-    <FormValidator/>
+        <FormValidator />
 
-    <FormButton Name="Sign In" IsSubmit="true" />
-</FormTemplate>
+        <FormButton Name="Sign In" IsSubmit="true" />
+    </FormTemplate>
+</div>
 
 @code {
     public class SignInModel

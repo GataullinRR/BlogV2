@@ -2,16 +2,22 @@
 @inject IBlogService Blog;
 @inject NavigationManager Navigator;
 
-<FormTemplate OnSubmit="SignUpAsync">
-    <FormTextInput Name="User name" @bind-Value="@_model.UserName" />
-    <FormTextInput Name="E-mail" @bind-Value="@_model.EMail" />
-    <FormTextInput Name="Password" type="password" @bind-Value="@_model.Password" />
-    <FormTextInput Name="Password confirmation" type="password" @bind-Value="@_model.PasswordConfirmation" />
+<div class="form-sm mx-auto">
+    <FormTemplate OnSubmit="SignUpAsync">
+        <span>User name</span>
+        <FormTextInput @bind-Value="@_model.UserName" />
+        <span>E-mail</span>
+        <FormTextInput @bind-Value="@_model.EMail" />
+        <span>Password</span>
+        <FormTextInput type="password" @bind-Value="@_model.Password" />
+        <span>Password confirmation</span>
+        <FormTextInput type="password" @bind-Value="@_model.PasswordConfirmation" />
 
-    <FormValidator />
+        <FormValidator />
 
-    <FormButton Name="Sign Up" IsSubmit="true" />
-</FormTemplate>
+        <FormButton Name="Sign Up" IsSubmit="true" />
+    </FormTemplate>
+</div>
 
 @code {
     public class SignUpModel

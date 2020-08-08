@@ -2,7 +2,7 @@
 
 @if (Post != null)
 {
-    <div class="col mx-auto mt-2">
+    <div class="col mx-auto">
         <FormTemplate Model="Post" OnSubmit="SubmitAsync">
             <span>Title</span>
             <FormTextInput @bind-Value="@Post.Title" />

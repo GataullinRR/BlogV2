@@ -3,27 +3,25 @@
 
 @if(_post != null)
 {
-    <div class="col mt-2">
-        <h3>
-            <span>
-                <span class="@(_post.IsHidden ? "text-muted" : "")">@_post.Title</span>
-                <AuthorizeView Roles="Admin">
-                    <span style="white-space:pre"> | </span>
-                    <NavigationInlineButton Path="@PostEdit.GetPath(_post.Id)">Edit</NavigationInlineButton>
-                    <span style="white-space:pre"> | </span>
-                    <InlineButton @onclick="UpdateHiddenStateAsync">@(_post.IsHidden ? "Unhide" : "Hide")</InlineButton>
-                </AuthorizeView>
-            </span>
-        </h3>
+    <h3>
+        <span>
+            <span class="@(_post.IsHidden ? "text-muted" : "")">@_post.Title</span>
+            <AuthorizeView Roles="Admin">
+                <span style="white-space:pre"> | </span>
+                <NavigationInlineButton Path="@PostEdit.GetPath(_post.Id)">Edit</NavigationInlineButton>
+                <span style="white-space:pre"> | </span>
+                <InlineButton @onclick="UpdateHiddenStateAsync">@(_post.IsHidden ? "Unhide" : "Hide")</InlineButton>
+            </AuthorizeView>
+        </span>
+    </h3>
 
-        <div class="mce-content-body text-justify" id="tinymce" data-id="Body">
-            @((MarkupString)_post.Body)
-        </div>
+    <div class="mce-content-body text-justify" id="tinymce" data-id="Body">
+        @((MarkupString)_post.Body)
+    </div>
 
-        <div class="d-flex text-muted mt-2">
-            <span style="white-space: pre">Written by @_post.Author.UserName (@_post.Author.Email)</span>
-            <span class="ml-auto">@_post.CreationTime.ToLocalTime().ToString("dd.MM.yyyy")</span>
-        </div>
+    <div class="d-flex text-muted mt-2">
+        <span style="white-space: pre">Written by @_post.Author.UserName (@_post.Author.Email)</span>
+        <span class="ml-auto">@_post.CreationTime.ToLocalTime().ToString("dd.MM.yyyy")</span>
     </div>
 }
 
