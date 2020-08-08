@@ -21,8 +21,15 @@
 
     <script src="https://cdn.tiny.cloud/1/6xcikwqalselltmhunqnriulh959p2aqkadbcipate8yqlvw/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
+        var _body = "";
+
         function InitTinyMCE() {
             tinymce.init({
+                setup: editor => {
+                    editor.on('init', () => {
+                        editor.setContent(_body);
+                    });
+                },
                 mode: "specific_textareas",
                 editor_selector: "rich-edit",
                 plugins: 'preview paste searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen table image link codesample charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
@@ -58,6 +65,15 @@
 
         function GetBody() {
             return tinymce.activeEditor.getContent();
+        }
+
+        function SetBody(body) {
+            if (tinymce.initialized === true) {
+                return tinymce.activeEditor.setContent(body);
+            }
+            else {
+                _body = body;
+            }
         }
     </script>
     <script src="_framework/blazor.webassembly.js"></script>

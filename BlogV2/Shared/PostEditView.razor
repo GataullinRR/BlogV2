@@ -1,0 +1,53 @@
+﻿@inject IJSRuntime JS;
+
+@if (Post != null)
+{
+    <div class="col mx-auto mt-2">
+        <FormTemplate Model="Post" OnSubmit="SubmitAsync">
+            <span>Title</span>
+            <FormTextInput @bind-Value="@Post.Title" />
+
+            <span>Body</span>
+            <textarea class="form-control rich-edit" />
+
+            <FormValidator />
+
+            <div class="mt-2">
+                <FormButton Name="@SubmitName" IsSubmit="true" />
+            </div>
+        </FormTemplate>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public PostData? Post { get; set; }
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    [Parameter]
+    public string SubmitName { get; set; } = "Submit";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Post != null)
+        {
+            await JS.InvokeAsync<string>("SetBody", Post.Body);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JS.InvokeAsync<object>("InitTinyMCE");
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task SubmitAsync(object arg)
+    {
+        Post.Body = await JS.InvokeAsync<string>("GetBody");
+
+        await OnSubmit.InvokeAsync(arg);
+    }
+}

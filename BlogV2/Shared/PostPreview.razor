@@ -5,7 +5,7 @@
     <div class="my-2">
         <h3><InlineButton @onclick="() => Navigator.NavigateTo(Pages.Post.GetPath(Post.Id))">@Post.Title</InlineButton></h3>
 
-        <div>@Post.BodyPreview</div>
+        <div>@((MarkupString)@Post.BodyPreview)</div>
 
         <div class="d-flex text-muted">
             <span style="white-space: pre">Written by @Post.Author.UserName</span>

@@ -4,7 +4,15 @@
 @if(_post != null)
 {
     <div class="col">
-        <h3>@_post.Title</h3>
+        <h3>
+            <span>
+                @_post.Title
+                <AuthorizeView Roles="Admin">
+                    <span style="white-space:pre"> | </span> 
+                    <NavigationInlineButton Path="@PostEdit.GetPath(_post.Id)">Edit</NavigationInlineButton>
+                </AuthorizeView>
+            </span>
+        </h3>
 
         <div class="mce-content-body text-justify" id="tinymce" data-id="Body">
             @((MarkupString)_post.Body)

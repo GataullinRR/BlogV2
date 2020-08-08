@@ -1,0 +1,9 @@
+﻿@inject NavigationManager Navigator
+@inherits NavLink
+
+<InlineButton @onclick="() => Navigator.NavigateTo(Path)">@ChildContent</InlineButton>
+
+@code { 
+    [Parameter]
+    public string Path { get; set; }
+}

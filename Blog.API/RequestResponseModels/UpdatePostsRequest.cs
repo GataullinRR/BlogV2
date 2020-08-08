@@ -7,9 +7,13 @@ namespace BlogService.API
     public class UpdatePostsRequest
     {
         [Required]
-        public Post[] Posts { get; set; }
+        public PostUpdateData[] Posts { get; set; }
 
-        public UpdatePostsRequest(Post[] posts)
+        public UpdatePostsRequest()
+        {
+
+        }
+        public UpdatePostsRequest(params PostUpdateData[] posts)
         {
             Posts = posts ?? throw new ArgumentNullException(nameof(posts));
         }

@@ -1,0 +1,33 @@
+﻿@page "/edit/{Id}"
+@inject IBlogService Blog
+@inject NavigationManager Navigator
+
+<PostEditView OnSubmit="SaveAsync" Post="_postData" SubmitName="Save" />
+
+@code {
+    public static string GetPath(int postId)
+    {
+        return $"edit/{postId}";
+    }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private PostUpdateData _postData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Blog.QueryPostsAsync(QueryPostsRequest.QueryByIds(int.Parse(Id)));
+        var _post = response.Posts.Single();
+        _postData = new PostUpdateData(_post.Id, _post.Title, _post.Body, null);
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task SaveAsync()
+    {
+        await Blog.UpdatePostsAsync(new UpdatePostsRequest(_postData));
+
+        Navigator.NavigateTo(Pages.Post.GetPath(int.Parse(Id)));
+    }
+}

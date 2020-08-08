@@ -7,6 +7,7 @@ using BlogService.Db;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -57,9 +58,17 @@ namespace BlogService.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UpdatePosts([FromBody]UpdatePostsRequest request)
         {
-            foreach (var updatedPost in request.Posts)
+            await PreparePostDataAsync(request.Posts);
+            var ids = request.Posts.Select(p => p.Id).ToArray();
+            var posts = await _db.Posts
+                .Where(p => ids.Contains(p.Id))
+                .ToArrayAsync();
+            foreach (var post in posts)
             {
-                _db.Entry(updatedPost).State = EntityState.Modified;
+                var newPost = request.Posts.First(p => p.Id == post.Id);
+                post.Title = newPost.Title;
+                post.Body = newPost.Body;
+                post.BodyPreview = newPost.BodyPreview;
             }
             await _db.SaveChangesAsync();
 
@@ -70,25 +79,34 @@ namespace BlogService.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> CreatePosts([FromBody]CreatePostsRequest request, [FromServices]UserManager<User> userManager)
         {
+            await PreparePostDataAsync(request.Posts);
             var author = await userManager.FindByNameAsync(User.Identity.Name);
             var posts = request.Posts
-                .Select(d => new Post(DateTime.UtcNow, author, d.Title, d.Body, d.BodyPreview ?? GetBodyPreview(d.Body)))
+                .Select(d => new Post(DateTime.UtcNow, author, d.Title, d.Body, d.BodyPreview))
                 .ToArray();
-            foreach (var post in posts)
-            {
-                post.Body = await _sanitizer.SanitizeAsync(post.Body);
-                post.BodyPreview = _sanitizer.IgnoreNonTextNodes(post.BodyPreview);
-            }
-
             await _db.Posts.AddRangeAsync(posts);
             await _db.SaveChangesAsync();
 
             return Ok(new CreatePostsResponse(posts.Select(p => p.Id).ToArray()));
         }
 
-        private string GetBodyPreview(string body)
+        private async Task PreparePostDataAsync(PostData[] datas)
         {
-            return new string(body.Take(500).ToArray());
+            foreach (var data in datas)
+            {
+                data.Body = await _sanitizer.SanitizeAsync(data.Body);
+                if (data.BodyPreview == null)
+                {
+                    data.BodyPreview = _sanitizer.IgnoreNonTextNodes(data.Body);
+                    data.BodyPreview = new string(data.BodyPreview.Take(500).ToArray()) 
+                        + ((data.BodyPreview.Length > 500) ? "..." : "");
+                }
+                else
+                {
+                    data.BodyPreview = await _sanitizer.SanitizeAsync(data.BodyPreview);
+                    _sanitizer.IgnoreNonTextNodes(data.BodyPreview);
+                }
+            }
         }
     }
 }

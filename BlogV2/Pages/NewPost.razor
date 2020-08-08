@@ -3,21 +3,7 @@
 @inject NavigationManager Navigator
 @inject IJSRuntime jsRuntime
 
-<div class="col mx-auto">
-    <FormTemplate Model="_model" OnSubmit="PostAsync">
-        <span>Title</span>
-        <FormTextInput @bind-Value="@_model.Title" />
-
-        <span>Body</span>
-        <textarea class="form-control rich-edit" />
-
-        <FormValidator />
-
-        <div class="mt-2">
-            <FormButton Name="Publish" IsSubmit="true" />
-        </div>
-    </FormTemplate>
-</div>
+<PostEditView OnSubmit="PostAsync" Post="_model" SubmitName="Publish" />
 
 @code {
     public static string GetPath()
@@ -29,7 +15,7 @@
 
     public async Task PostAsync()
     {
-        _model.Body = await jsRuntime.InvokeAsync<string>("GetBody");
+        //_model.Body = await jsRuntime.InvokeAsync<string>("GetBody");
         var response = await Blog.CreatePostsAsync(new CreatePostsRequest(_model));
         Navigator.NavigateTo(Post.GetPath(response.Ids.Single()));
     }
@@ -39,12 +25,5 @@
         _model.Body = "TEST";
 
         return base.OnInitializedAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await jsRuntime.InvokeAsync<object>("InitTinyMCE", "");
-
-        await base.OnAfterRenderAsync(firstRender);
     }
 }
