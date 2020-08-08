@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject IBlogService Blog
+@inject AuthenticationStateProvider AuthStateProvider
 
 <div class="col mx-auto">
     @if (_posts != null)
@@ -21,6 +22,12 @@
     protected override async Task OnInitializedAsync()
     {
         _posts = (await Blog.QueryPostsAsync(QueryPostsRequest.QueryAll())).Posts;
+
+        var state = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (!state.User.IsInRole("Admin"))
+        {
+            _posts = _posts.Where(p => p.IsHidden == false).ToArray();
+        }
 
         await base.OnInitializedAsync();
     }

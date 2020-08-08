@@ -9,15 +9,14 @@ namespace BlogService.Db
     {
         public DbSet<Post> Posts { get; set; }
 
-        public BlogContext(DbContextOptions<BlogContext> options)
-            : base(options)
+        public BlogContext(DbContextOptions<BlogContext> options) : base(options)
         {
-            Database.EnsureCreated();
+            // Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Dont know why but i'm gettin NullRefEx at Database.EnsureCreated(); without this line...
+            // Don't know why but i'm getting NullRefEx at Database.EnsureCreated(); without this line...
             optionsBuilder.UseLoggerFactory(LoggerFactory.Create(b => { }));
         }
     }

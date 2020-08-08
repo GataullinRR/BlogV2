@@ -11,8 +11,18 @@ namespace BlogService.Db
         [Key] 
         public int Id { get; set; }
 
+        [Required]
+        public bool IsHidden { get; set; }
+
+        [Required]
+        public bool IsDeleted { get; set; }
+
         [Required] 
         public DateTime CreationTime { get; set; }
+
+        // Yes, no migrations, but inconvenient
+        //[Required]
+        //public List<PostAttribute> Attributes { get; set; } = new List<PostAttribute>();
 
         [Required] 
         [InverseProperty(nameof(User.Posts))]
@@ -41,4 +51,12 @@ namespace BlogService.Db
             BodyPreview = bodyPreview ?? throw new ArgumentNullException(nameof(bodyPreview));
         }
     }
+
+    //public class PostAttribute
+    //{
+    //    public int Id { get; set; }
+
+    //    public string Name { get; set; }
+    //    public string Value { get; set; }
+    //}
 }

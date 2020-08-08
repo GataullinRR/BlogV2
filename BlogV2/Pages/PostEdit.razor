@@ -13,13 +13,13 @@
     [Parameter]
     public string Id { get; set; }
 
-    private PostUpdateData _postData;
+    private PostDataUpdateRequest _postData;
 
     protected override async Task OnInitializedAsync()
     {
         var response = await Blog.QueryPostsAsync(QueryPostsRequest.QueryByIds(int.Parse(Id)));
         var _post = response.Posts.Single();
-        _postData = new PostUpdateData(_post.Id, _post.Title, _post.Body, null);
+        _postData = new PostDataUpdateRequest(_post.Id, _post.Title, _post.Body, null);
 
         await base.OnInitializedAsync();
     }

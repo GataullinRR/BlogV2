@@ -91,7 +91,9 @@ namespace BlogService
             //            };
             //        });
 
-            services.AddHostedService<DbSeeder>();
+            services.AddHostedService<DbInitializerHost>();
+            services.AddTransient<IDbInitializer, DbRolesInitializer>();
+            services.AddTransient<IDbInitializer, DbMigrator>();
 
             services.AddScoped<IStorage, Storage>();
             services.AddScoped<IPostSanitizer, PostSanitizer>();
@@ -105,8 +107,12 @@ namespace BlogService
             //    return new UrlHelper(actionContext);
             //});
 
-            services.AddMvc()
-                    .AddNewtonsoftJson();
+            services.AddControllers()
+                    .AddNewtonsoftJson(options =>
+                    {
+                        options.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+                        options.SerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.All;
+                    });
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });

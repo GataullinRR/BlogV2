@@ -8,14 +8,14 @@ namespace BlogService.API
     public class QueryPostsResponse
     {
         [Required]
-        public List<Post> Posts { get; set; }
+        public Post[] Posts { get; set; }
 
         public QueryPostsResponse()
         {
 
         }
 
-        public QueryPostsResponse(List<Post> posts)
+        public QueryPostsResponse(Post[] posts)
         {
             Posts = posts ?? throw new ArgumentNullException(nameof(posts));
         }

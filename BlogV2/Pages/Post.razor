@@ -3,13 +3,15 @@
 
 @if(_post != null)
 {
-    <div class="col">
+    <div class="col mt-2">
         <h3>
             <span>
-                @_post.Title
+                <span class="@(_post.IsHidden ? "text-muted" : "")">@_post.Title</span>
                 <AuthorizeView Roles="Admin">
-                    <span style="white-space:pre"> | </span> 
+                    <span style="white-space:pre"> | </span>
                     <NavigationInlineButton Path="@PostEdit.GetPath(_post.Id)">Edit</NavigationInlineButton>
+                    <span style="white-space:pre"> | </span>
+                    <InlineButton @onclick="UpdateHiddenStateAsync">@(_post.IsHidden ? "Unhide" : "Hide")</InlineButton>
                 </AuthorizeView>
             </span>
         </h3>
@@ -46,5 +48,12 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+    }
+
+    private async Task UpdateHiddenStateAsync()
+    {
+        _post.IsHidden = !_post.IsHidden;
+
+        await Blog.UpdatePostsAsync(new UpdatePostsRequest(new PostMetadataUpdateRequest(_post.Id, _post.IsHidden, null)));
     }
 }

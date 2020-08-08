@@ -29,13 +29,13 @@ namespace BlogService.Controllers
         [HttpPost(BlogServiceEndpoints.QueryPosts)]
         public async Task<IActionResult> QueryPosts([FromBody]QueryPostsRequest request)
         {
-            var posts = (List<Post>)null; 
+            var posts = (Post[])null; 
             if (request.PostIds == null)
             {
                 posts = await _db.Posts
                     .Include(p => p.Author)
                     .AsNoTracking()
-                    .ToListAsync();
+                    .ToArrayAsync();
             }
             else
             {
@@ -43,7 +43,7 @@ namespace BlogService.Controllers
                     .Include(p => p.Author)
                     .AsNoTracking()
                     .Where(p => request.PostIds.Contains(p.Id))
-                    .ToListAsync();
+                    .ToArrayAsync();
             }
 
             foreach (var post in posts)
@@ -58,17 +58,33 @@ namespace BlogService.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UpdatePosts([FromBody]UpdatePostsRequest request)
         {
-            await PreparePostDataAsync(request.Posts);
-            var ids = request.Posts.Select(p => p.Id).ToArray();
+            var requestsByPost = request.UpdateRequests.GroupBy(r => r.PostId).ToArray();
+            var ids = requestsByPost.Select(g => g.Key).ToArray();
             var posts = await _db.Posts
                 .Where(p => ids.Contains(p.Id))
                 .ToArrayAsync();
             foreach (var post in posts)
             {
-                var newPost = request.Posts.First(p => p.Id == post.Id);
-                post.Title = newPost.Title;
-                post.Body = newPost.Body;
-                post.BodyPreview = newPost.BodyPreview;
+                var updateRequests = requestsByPost.First(g => g.Key == post.Id).ToArray();
+                foreach (var updateRequest in updateRequests)
+                {
+                    if (updateRequest is PostDataUpdateRequest pd)
+                    {
+                        await PreparePostDataAsync(new PostData[] { pd });
+                        post.Title = pd.Title;
+                        post.Body = pd.Body;
+                        post.BodyPreview = pd.BodyPreview;
+                    }
+                    else if (updateRequest is PostMetadataUpdateRequest pm)
+                    {
+                        post.IsHidden = pm.IsHidden ?? post.IsHidden;
+                        post.IsDeleted = pm.IsDeleted ?? post.IsDeleted;
+                    }   
+                    else
+                    {
+                        throw new NotSupportedException();
+                    }
+                }
             }
             await _db.SaveChangesAsync();
 
@@ -79,15 +95,22 @@ namespace BlogService.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> CreatePosts([FromBody]CreatePostsRequest request, [FromServices]UserManager<User> userManager)
         {
-            await PreparePostDataAsync(request.Posts);
             var author = await userManager.FindByNameAsync(User.Identity.Name);
-            var posts = request.Posts
-                .Select(d => new Post(DateTime.UtcNow, author, d.Title, d.Body, d.BodyPreview))
-                .ToArray();
-            await _db.Posts.AddRangeAsync(posts);
-            await _db.SaveChangesAsync();
+            if (author == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                await PreparePostDataAsync(request.Posts);
+                var posts = request.Posts
+                    .Select(d => new Post(DateTime.UtcNow, author, d.Title, d.Body, d.BodyPreview))
+                    .ToArray();
+                await _db.Posts.AddRangeAsync(posts);
+                await _db.SaveChangesAsync();
 
-            return Ok(new CreatePostsResponse(posts.Select(p => p.Id).ToArray()));
+                return Ok(new CreatePostsResponse(posts.Select(p => p.Id).ToArray()));
+            }
         }
 
         private async Task PreparePostDataAsync(PostData[] datas)

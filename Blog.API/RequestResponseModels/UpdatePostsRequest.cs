@@ -7,15 +7,16 @@ namespace BlogService.API
     public class UpdatePostsRequest
     {
         [Required]
-        public PostUpdateData[] Posts { get; set; }
+        public IPostUpdateRequest[] UpdateRequests { get; set; }
 
         public UpdatePostsRequest()
         {
 
         }
-        public UpdatePostsRequest(params PostUpdateData[] posts)
+
+        public UpdatePostsRequest(params IPostUpdateRequest[] updateRequests)
         {
-            Posts = posts ?? throw new ArgumentNullException(nameof(posts));
+            UpdateRequests = updateRequests ?? throw new ArgumentNullException(nameof(updateRequests));
         }
     }
 }
