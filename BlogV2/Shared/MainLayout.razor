@@ -1,16 +1,24 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="container-fluid">
-    <div class="row">
+<div class="d-flex flex-column flex-fill min-vh-100">
+    <div>
         <NavMenu />
     </div>
 
-    <div class="row">
-        <div class="col mx-auto" style="max-width:1000px">
-            <div class="row">
-                @Body
-            </div>
+    <div class="flex-grow-1">
+        <div class="mx-auto" style="max-width:1000px">
+            @Body
+        </div>
+    </div>
+
+    <div class="mx-3 my-3">
+        <div class="d-flex">
+            <span style="white-space: pre">Created by <a href="https://github.com/GataullinRR">GataullinRR</a></span>
+            <span class="ml-auto">Powered by Blazor WASM</span>
+        </div>
+
+        <div class="d-flex">
+            <span class="small text-muted">The blog is under development, functionality is very limited. <a href="https://github.com/GataullinRR/Blog">The first version</a> was better!</span>
         </div>
     </div>
 </div>
-

@@ -1,5 +1,9 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+body {
+    min-height: 100vh;
+}
+
 .mce-content-body table {
     border-collapse: collapse
 }
@@ -225,8 +229,8 @@ app {
         display: none;
     }
 
-    .sidebar .collapse {
+    .sidebar .collapse {*/
         /* Never collapse the sidebar for wide screens */
-        display: block;
+        /*display: block;
     }
 }
