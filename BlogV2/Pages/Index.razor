@@ -1,6 +1,7 @@
 ﻿@page "/"
 @inject IBlogService Blog
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime JS
 
 <div class="mx-auto">
     @if (_posts != null)

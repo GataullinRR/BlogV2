@@ -15,9 +15,11 @@
         </span>
     </h3>
 
-    <div class="mce-content-body text-justify" id="tinymce" data-id="Body">
+    <TinyMCEContentView>
         @((MarkupString)_post.Body)
-    </div>
+        @*<div class="mce-content-body" id="tinymce" data-id="Body">
+        </div>*@
+    </TinyMCEContentView>
 
     <div class="d-flex text-muted mt-2">
         <span style="white-space: pre">Written by @_post.Author.UserName (@_post.Author.Email)</span>

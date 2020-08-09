@@ -115,9 +115,10 @@ namespace BlogService.Controllers
 
         private async Task PreparePostDataAsync(PostData[] datas)
         {
+            var escapeExecutables = false;
             foreach (var data in datas)
             {
-                data.Body = await _sanitizer.SanitizeAsync(data.Body);
+                data.Body = await _sanitizer.SanitizeAsync(data.Body, escapeExecutables);
                 if (data.BodyPreview == null)
                 {
                     data.BodyPreview = _sanitizer.IgnoreNonTextNodes(data.Body);
@@ -126,7 +127,7 @@ namespace BlogService.Controllers
                 }
                 else
                 {
-                    data.BodyPreview = await _sanitizer.SanitizeAsync(data.BodyPreview);
+                    data.BodyPreview = await _sanitizer.SanitizeAsync(data.BodyPreview, escapeExecutables);
                     _sanitizer.IgnoreNonTextNodes(data.BodyPreview);
                 }
             }

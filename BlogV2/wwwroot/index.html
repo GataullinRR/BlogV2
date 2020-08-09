@@ -8,6 +8,9 @@
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
+    <link href="css/prism.css" rel="stylesheet" />
+    <!--<link href="https://cdn.tiny.cloud/1/invalid-origin/tinymce/5.4.1-89/skins/ui/oxide/content.css" rel="stylesheet" />-->
+    <!--<link href="css/tinymce_content.css" rel="stylesheet" />-->
 </head>
 
 <body>
@@ -19,48 +22,61 @@
         <a class="dismiss">🗙</a>
     </div>
 
+    <!--<script src="tinymce/tinymce.min.js"></script>-->
     <script src="https://cdn.tiny.cloud/1/6xcikwqalselltmhunqnriulh959p2aqkadbcipate8yqlvw/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         var _body = "";
 
         function InitTinyMCE() {
-            tinymce.init({
-                setup: editor => {
-                    editor.on('init', () => {
-                        editor.setContent(_body);
-                    });
-                },
-                mode: "specific_textareas",
-                editor_selector: "rich-edit",
-                plugins: 'preview paste searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen table image link codesample charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
-                imagetools_cors_hosts: ['picsum.photos'],
-                toolbar: 'undo redo | bold italic underline strikethrough | outdent indent |  numlist bullist | removeformat | charmap emoticons | fullscreen preview | insertfile image media link anchor codesample',
-                toolbar_sticky: true,
-                autosave_ask_before_unload: true,
-                autosave_interval: "30s",
-                autosave_prefix: "{path}{query}-{id}-",
-                autosave_restore_when_empty: false,
-                autosave_retention: "10m",
-                image_advtab: true,
-                importcss_append: true,
-                height: 400,
-                height: 600,
-                image_caption: true,
-                quickbars_selection_toolbar: 'bold italic underline strikethrough | quicklink blockquote quickimage quicktable',
-                noneditable_noneditable_class: "mceNonEditable",
-                toolbar_drawer: 'sliding',
-                contextmenu: "link image imagetools",
-                menu: {
-                    file: { title: 'File', items: 'newdocument restoredraft | preview | print ' },
-                    edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
-                    view: { title: 'View', items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen' },
-                    insert: { title: 'Insert', items: 'image link media codesample inserttable | charmap emoticons hr | anchor toc | insertdatetime' },
-                    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
-                    tools: { title: 'Tools', items: 'code wordcount' },
-                    table: { title: 'Table', items: 'inserttable tableprops deletetable row column cell' },
-                    help: { title: 'Help', items: '' }
-                }
-            });
+            if (tinymce.initialized !== true) {
+                tinymce.init({
+                    setup: editor => {
+                        editor.on('init', () => {
+                            editor.setContent(_body);
+                        });
+                    },
+
+                    // img in my case
+                    // https://www.prestashop.com/forums/topic/421084-solvedtinymce-removes-html-tags/
+                    apply_source_formatting: false,                //added option
+                    verify_html: false,                            //added option
+                    //extended_valid_elements: "img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name]",
+                    extended_valid_elements: "*[*]",
+                    valid_elements: "*[*]",
+
+                    //content_css: "css/bootstrap/bootstrap.min.css,css/prism.css",
+                    mode: "specific_textareas",
+                    editor_selector: "rich-edit",
+                    plugins: 'preview paste searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen table image link codesample charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+                    imagetools_cors_hosts: ['picsum.photos'],
+                    toolbar: 'undo redo | bold italic underline strikethrough | outdent indent |  numlist bullist | removeformat | charmap emoticons | fullscreen preview | insertfile image media link anchor codesample',
+                    toolbar_sticky: true,
+                    autosave_ask_before_unload: true,
+                    autosave_interval: "30s",
+                    autosave_prefix: "{path}{query}-{id}-",
+                    autosave_restore_when_empty: false,
+                    autosave_retention: "10m",
+                    image_advtab: true,
+                    importcss_append: true,
+                    height: 400,
+                    height: 600,
+                    image_caption: true,
+                    quickbars_selection_toolbar: 'bold italic underline strikethrough | quicklink blockquote quickimage quicktable',
+                    noneditable_noneditable_class: "mceNonEditable",
+                    toolbar_drawer: 'sliding',
+                    contextmenu: "link image imagetools",
+                    menu: {
+                        file: { title: 'File', items: 'newdocument restoredraft | preview | print ' },
+                        edit: { title: 'Edit', items: 'undo redo | cut copy paste | selectall | searchreplace' },
+                        view: { title: 'View', items: 'code | visualaid visualchars visualblocks | spellchecker | preview fullscreen' },
+                        insert: { title: 'Insert', items: 'image link media codesample inserttable | charmap emoticons hr | anchor toc | insertdatetime' },
+                        format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript | removeformat' },
+                        tools: { title: 'Tools', items: 'code wordcount' },
+                        table: { title: 'Table', items: 'inserttable tableprops deletetable row column cell' },
+                        help: { title: 'Help', items: '' }
+                    }
+                });
+            }
         }
 
         function GetBody() {
@@ -75,7 +91,14 @@
                 _body = body;
             }
         }
+
+        //function JSInitialize() {
+        //    // https://www.reddit.com/r/Blazor/comments/hknz58/prism_syntax_highlighter_with_blazor/fwumaoh/
+        //    window.Prism.highlightAll(); 
+        //}
     </script>
+
+    <script src="js/prism.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 

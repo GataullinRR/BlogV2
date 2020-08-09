@@ -35,9 +35,11 @@ namespace BlogService.Controllers
                 allowedCssClasses: "language-csharp language-markup language-javascript language-css language-php language-ruby language-python language-java language-c language-cpp token operator punctuation keyword string number".Split(" "));
         }
 
-        public async Task<string> SanitizeAsync(string body)
+        public async Task<string> SanitizeAsync(string body, bool escapeExecutable)
         {
-            var intermediate = _allowAllButNotExecutable.Sanitize(body);
+            var intermediate = escapeExecutable
+                ? _allowAllButNotExecutable.Sanitize(body)
+                : body;
             var document = new HtmlDocument();
             document.LoadHtml(intermediate);
             var nodes = document.DocumentNode.SelectNodes("//img");
@@ -47,7 +49,7 @@ namespace BlogService.Controllers
                 {
                     var srcAttr = node.Attributes.Single(a => a.Name == "src");
                     var src = srcAttr.Value;
-                    src = await TrySanitizeImage(src);
+                    //src = await TrySanitizeImage(src);
                     if (src == null)
                     {
                         node.Remove();
@@ -61,7 +63,15 @@ namespace BlogService.Controllers
                         {
                             node.Attributes.Add(ATTRIBUTE, "");
                         }
-                        node.Attributes[ATTRIBUTE].Value += " rounded img-fluid";
+
+                        if (string.IsNullOrEmpty(node.Attributes[ATTRIBUTE].Value))
+                        {
+                            node.Attributes[ATTRIBUTE].Value = "rounded img-fluid";
+                        }
+                        else
+                        {
+                            node.Attributes[ATTRIBUTE].Value += " rounded img-fluid";
+                        }
                     }
                 }
             }
