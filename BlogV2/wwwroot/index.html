@@ -25,14 +25,17 @@
     <!--<script src="tinymce/tinymce.min.js"></script>-->
     <script src="https://cdn.tiny.cloud/1/6xcikwqalselltmhunqnriulh959p2aqkadbcipate8yqlvw/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
-        var _body = "";
+        var _bodyMap = new Map();
 
-        function InitTinyMCE() {
-            if (tinymce.initialized !== true) {
+        function InitTinyMCE(editorId, isSmall) {
+            var existing = tinymce.get(editorId);
+            if (existing == undefined || existing.initialized !== true) {
                 tinymce.init({
                     setup: editor => {
                         editor.on('init', () => {
-                            editor.setContent(_body);
+                            if (_bodyMap.has(editorId)) {
+                                editor.setContent(_bodyMap.get(editorId));
+                            }
                         });
                     },
 
@@ -46,7 +49,9 @@
 
                     //content_css: "css/bootstrap/bootstrap.min.css,css/prism.css",
                     mode: "specific_textareas",
-                    editor_selector: "rich-edit",
+                    // only class lol
+                    //editor_selector: "#" + editorId,
+                    selector: "#" + editorId,
                     plugins: 'preview paste searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen table image link codesample charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
                     imagetools_cors_hosts: ['picsum.photos'],
                     toolbar: 'undo redo | bold italic underline strikethrough | outdent indent |  numlist bullist | removeformat | charmap emoticons | fullscreen preview | insertfile image media link anchor codesample',
@@ -58,8 +63,7 @@
                     autosave_retention: "10m",
                     image_advtab: true,
                     importcss_append: true,
-                    height: 400,
-                    height: 600,
+                    height: isSmall ? 350 : 600,
                     image_caption: true,
                     quickbars_selection_toolbar: 'bold italic underline strikethrough | quicklink blockquote quickimage quicktable',
                     noneditable_noneditable_class: "mceNonEditable",
@@ -77,18 +81,38 @@
                     }
                 });
             }
+            else {
+                // https://stackoverflow.com/questions/7434933/displayin-tinymce-after-twice-ajax-call
+                if (existing != undefined) {
+                    tinymce.remove(existing);
+                }
+                tinymce.execCommand('mceAddControl', false, editorId);
+            }
         }
 
-        function GetBody() {
-            return tinymce.activeEditor.getContent();
+        function GetBody(editorId) {
+            if (tinymce.get(editorId) != undefined) {
+                return tinymce.get(editorId).getContent();
+            }
+            return "";
         }
 
-        function SetBody(body) {
-            if (tinymce.initialized === true) {
-                return tinymce.activeEditor.setContent(body);
+        //function SetBody(editorId, body) {
+        //    if (tinymce.initialized === true) {
+        //         tinymce.get(editorId).setContent(body);
+        //    }
+        //    else {
+        //        _bodyMap.set(editorId, body);
+        //    }
+        //}
+
+        function SetBody(editorId, body) {
+            var editor = tinymce.get(editorId);
+            if (editor != undefined && editor.initialized === true) {
+                tinymce.get(editorId).setContent(body);
             }
             else {
-                _body = body;
+                _bodyMap.set(editorId, body);
             }
         }
 

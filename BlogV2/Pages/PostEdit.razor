@@ -19,7 +19,7 @@
     {
         var response = await Blog.QueryPostsAsync(QueryPostsRequest.QueryByIds(int.Parse(Id)));
         var _post = response.Posts.Single();
-        _postData = new PostDataUpdateRequest(_post.Id, _post.Title, _post.Body, null);
+        _postData = new PostDataUpdateRequest(_post.Id, _post.Title, _post.Body, _post.BodyPreview);
 
         await base.OnInitializedAsync();
     }

@@ -5,7 +5,7 @@
     <div class="mb-2">
         <h3><InlineButton @onclick="() => Navigator.NavigateTo(Pages.Post.GetPath(Post.Id))"><span class="@(Post.IsHidden ? "text-muted" : "")">@Post.Title</span></InlineButton></h3>
 
-        <div>@((MarkupString)@Post.BodyPreview)</div>
+        <TinyMCEContentView>@((MarkupString)@Post.BodyPreview)</TinyMCEContentView>
 
         <div class="d-flex text-muted">
             <span style="white-space: pre">Written by @Post.Author.UserName</span>

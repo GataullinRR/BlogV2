@@ -7,8 +7,13 @@
             <span>Title</span>
             <FormTextInput @bind-Value="@Post.Title" />
 
-            <span>Body</span>
-            <textarea class="form-control rich-edit" />
+            <span>Body preview</span>
+            <textarea id="@PreviewEditorId" class="form-control" />
+
+            <div class="mt-2">
+                <span>Body</span>
+                <textarea id="@BodyEditorId" class="form-control" />
+            </div>
 
             <FormValidator />
 
@@ -20,6 +25,9 @@
 }
 
 @code {
+    const string BodyEditorId = "body";
+    const string PreviewEditorId = "bodypreview";
+
     [Parameter]
     public PostData? Post { get; set; }
 
@@ -33,20 +41,23 @@
     {
         if (Post != null)
         {
-            await JS.InvokeAsync<string>("SetBody", Post.Body);
+            await JS.InvokeAsync<string>("SetBody", BodyEditorId, Post.Body);
+            await JS.InvokeAsync<string>("SetBody", PreviewEditorId, Post.BodyPreview);
         }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JS.InvokeAsync<object>("InitTinyMCE");
+        await JS.InvokeAsync<object>("InitTinyMCE", BodyEditorId, false);
+        await JS.InvokeAsync<object>("InitTinyMCE", PreviewEditorId, true);
 
         await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task SubmitAsync(object arg)
     {
-        Post.Body = await JS.InvokeAsync<string>("GetBody");
+        Post.Body = await JS.InvokeAsync<string>("GetBody", BodyEditorId);
+        Post.BodyPreview = await JS.InvokeAsync<string>("GetBody", PreviewEditorId);
 
         await OnSubmit.InvokeAsync(arg);
     }
