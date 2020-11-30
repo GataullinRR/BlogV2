@@ -40,7 +40,11 @@ namespace BlogService
         {
             services.AddCors();
 
-            services.AddDbContext<BlogContext>(options => options.UseSqlServer(Configuration.GetValue<string>("DefaultConnection")));
+            services.AddDbContext<BlogContext>(options => 
+            {
+                var connectionString = Configuration.GetValue<string>("DefaultConnection");
+                options.UseSqlServer(connectionString);
+            });
 
             services.AddIdentity<User, IdentityRole>(options =>
                 {
@@ -74,22 +78,6 @@ namespace BlogService
                         ClockSkew = TimeSpan.FromMinutes(1)
                     };
                 });
-            // DOESNT WORK!
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //        .AddJwtBearer(options =>
-            //        {
-            //            options.SaveToken = true;
-            //            options.TokenValidationParameters = new TokenValidationParameters
-            //            {
-            //                ValidateIssuer = true,
-            //                ValidateAudience = true,
-            //                ValidateLifetime = true,
-            //                ValidateIssuerSigningKey = true,
-            //                ValidIssuer = Configuration["JwtIssuer"],
-            //                ValidAudience = Configuration["JwtAudience"],
-            //                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"]))
-            //            };
-            //        });
 
             services.AddHostedService<DbInitializerHost>();
             services.AddTransient<IDbInitializer, DbRolesInitializer>();
@@ -100,12 +88,6 @@ namespace BlogService
 
             services.AddHttpContextAccessor();
             services.AddUrlHelper();
-            //services.AddScoped<IUrlHelper>(factory =>
-            //{
-            //    var actionContext = factory.GetService<IActionContextAccessor>()
-            //                               .ActionContext;
-            //    return new UrlHelper(actionContext);
-            //});
 
             services.AddControllers()
                     .AddNewtonsoftJson(options =>
