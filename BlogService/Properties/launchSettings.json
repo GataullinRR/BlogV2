@@ -10,7 +10,7 @@
 
     "BlogService_PROD": {
       "commandName": "Project",
-      "applicationUrl": "https://localhost:5010",
+      "applicationUrl": "http://ec2-35-181-48-229.eu-west-3.compute.amazonaws.com:80/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"
       }
