@@ -1,0 +1,26 @@
+version: "3.3"
+services:
+    api:
+        build:
+            context: ./
+            dockerfile: ./BlogService/Dockerfile
+        ports:
+            - "5100:80"
+        env_file:
+            - ./.env
+        environment:
+            ASPNETCORE_ENVIRONMENT: ${ENV}
+            ASPNETCORE_DefaultConnection: ${DB}
+            ASPNETCORE_JwtSecurityKey: ${JWT_KEY}
+    web:
+        build:
+            context: ./
+            dockerfile: ./BlogV2/Dockerfile
+        ports:
+            - "${WEB_PORT}:80"
+        env_file:
+            - ./.env
+        environment:
+            ASPNETCORE_ENVIRONMENT: ${ENV}
+ 
+    
