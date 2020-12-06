@@ -31,6 +31,13 @@ namespace BlogV2
             services.AddSingleton<AuthTokenProvider>();
             services.AddTransient<IAuthTokenProvider>(sp => sp.GetRequiredService<AuthTokenProvider>());
             services.AddBlogService(builder.Configuration);
+            services.PostConfigure<BlogServiceOptions>(o =>
+            {
+                var hostedUri = new Uri(builder.HostEnvironment.BaseAddress);
+                var apiUriBilder = new UriBuilder(hostedUri);
+                apiUriBilder.Port = builder.Configuration.GetValue<int>("Services:API:Port");
+                o.Address = apiUriBilder.Uri;
+            });
 
             await builder.Build().RunAsync();
         }

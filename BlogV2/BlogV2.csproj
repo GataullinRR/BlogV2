@@ -6,6 +6,31 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <TempFolder>$([System.IO.Path]::GetTempPath())$([System.Guid]::NewGuid())</TempFolder>
+  </PropertyGroup>
+  
+  <!--https://stackoverflow.com/questions/4460721/custom-msbuild-task-locks-assembly-->
+  <!--https://mnaoumov.wordpress.com/2015/07/13/msbuild-custom-task-and-assembly-locks/-->
+  <Target Name="CopyTaskAssemblyToTempFolder" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <_CopyItems Include="$(SolutionDir)BlogV2.MsBuildTasks\bin\$(Configuration)\netstandard2.0\*.*" />
+    </ItemGroup>
+    <!--<Copy SourceFiles="$(SolutionDir)BlogV2.MsBuildTasks\bin\$(Configuration)\netcoreapp2.1\BlogV2.MsBuildTasks.deps.json"
+          DestinationFolder="$(TempFolder)"/>
+    <Copy SourceFiles="$(SolutionDir)BlogV2.MsBuildTasks\bin\$(Configuration)\netcoreapp2.1\BlogV2.MsBuildTasks.dll"
+          DestinationFolder="$(TempFolder)"/>-->
+    <Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(TempFolder)" />
+  </Target>
+
+  <UsingTask AssemblyFile="$(TempFolder)\BlogV2.MsBuildTasks.dll" TaskName="InjectEnvVarsMsBuildTask" />
+  <!--<UsingTask AssemblyFile="$(BaseOutputPath)$(Configuration)\$(TargetFramework)\BlogV2.MsBuildTasks.dll" TaskName="InjectEnvVarsMsBuildTask" />-->
+  <Target Name="InjectEnvVars" BeforeTargets="Build">
+    <!--Sometimes MSBuild caches the task, and you must restart the process https://stackoverflow.com/questions/25040907/msbuild-custom-task-not-fired-in-visual-studio-2013 -->
+    <!--<Message Text="About to run MsBuildTask" Importance="high" />-->
+    <InjectEnvVarsMsBuildTask />
+  </Target>
+  
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.0" />
@@ -18,11 +43,25 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Blog.API\BlogService.API.csproj" />
+    <!--<ProjectReference Include="..\BlogV2.MsBuildTasks\BlogV2.MsBuildTasks.csproj" />-->
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Misc\" />
     <Folder Include="Secrets\" />
     <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\appsettings.Production.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
